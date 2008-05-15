@@ -1,26 +1,7 @@
-import logging
 import shutil
 import re
 import os
-
-import zc.buildout
-
-log = logging.getLogger('PostGIS hook')
-
-def substitute(filename, search_re, replacement):
-    """Substitutes text within the contents of ``filename`` matching
-    ``search_re`` with ``replacement``.
-    """
-    search = re.compile(search_re, re.MULTILINE)
-    text = open(filename).read()
-    text = replacement.join(search.split(text))
-
-    newfilename = '%s%s' % (filename, '.~new')
-    newfile = open(newfilename, 'w')
-    newfile.write(text)
-    newfile.close()
-    shutil.copymode(filename, newfilename)
-    shutil.move(newfilename, filename)
+from minitage.core.common import substitute, append_env_var
 
 def pre_configure(options, buildout):
     cwd=buildout['buildout']['parts-directory']
@@ -64,14 +45,6 @@ os_ldflags=''
 uname=os.uname()[0]
 if uname == 'Darwin':
     os_ldflags=' -mmacosx-version-min=10.5.0'
-
-def append_env_var(env,var,sep=":",before=True):
-    """ append text to a environnement variable
-    @param env String variable to set
-    @param before append before or after the variable"""
-    for path in var:
-    	if before:os.environ[env] = "%s%s%s" % (path,sep,os.environ.get(env,''))
-	else:os.environ[env] = "%s%s%s" % (os.environ.get(env,''),sep,path)
 
 
 def getpostgisenv(options,buildout):
